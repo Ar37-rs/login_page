@@ -1,0 +1,38 @@
+
+# Login
+POST http://localhost:1323/login_api HTTP/1.1
+content-type: application/json
+
+{
+    "name": "adyaro",
+    "email": "adyaro@yandex.com",
+    "password": "12345678"
+}
+
+###
+
+# Signup
+POST http://localhost:1323/signup_api HTTP/1.1
+content-type: application/json
+
+
+{
+    "name": "adyaro",
+    "email": "adyaro@yandex.com",
+    "password": "12345678"
+}
+
+###
+
+# Check all logged users
+GET  http://localhost:1323/users_logged HTTP/1.1
+
+###
+
+# Check profile if user authorized
+GET  http://localhost:1323/profile HTTP/1.1
+
+###
+
+# Logout
+GET  http://localhost:1323/logout_api HTTP/1.1
