@@ -22,6 +22,61 @@ function App() {
   );
 }
 
+function ProfileView() {
+  let [user, setUser] = useState({ name: '', email: '' })
+  let [logged, setLogged] = useState(false)
+  let [logout, setLogout] = useState(false)
+  let [login, setLogin] = useState(false)
+
+  const handleLogout = (event: { preventDefault: () => void; }) => {
+    event.preventDefault();
+    axios.get('http://localhost:1323/logout_api', { withCredentials: true }).then(function (v) {
+      if (v.data.message === "Logged_out") {
+        setLogout(true)
+      }
+    })
+  }
+
+  useEffect(() => {
+    const timer = window.setInterval(async () => {
+      let v = await axios.get('http://localhost:1323/profile', { withCredentials: true })
+      if (v.status === 200) {
+        setUser({ name: v.data.name, email: v.data.email })
+        setLogged(true)
+      } else {
+        setLogged(false)
+      }
+    }, 500);
+    return () => {
+      window.clearInterval(timer);
+    }
+  }, [setLogged])
+
+  if (logout || login) {
+    return (<Navigate to="/" replace={true} />);
+  }
+
+  if (!logged) {
+    return (<div>
+      <div>Unauthorized 401</div>
+      <div>
+        <button onClick={() => {
+          setLogin(true)
+        }}>Login?</button>
+      </div>
+    </div>)
+  } else {
+    return (
+      <div>
+        <div>{user.name ? "Hello" : "Loading..."} {user.name} {user.email}</div>
+        <div>
+          <button onClick={handleLogout}>Logout?</button>
+        </div>
+      </div>
+    )
+  }
+}
+
 function Home() {
   const [submitting, setSubmitting] = useState(false);
   const [formdata, setformData] = useState<{
@@ -58,15 +113,6 @@ function Home() {
         }
       })
     }
-  }
-
-  window.onload = function () {
-    axios.get('http://localhost:1323/profile', { withCredentials: true }).then(function (v) {
-      if (v.status === 200) {
-        setSubmitting(true);
-        setLogged(true)
-      }
-    })
   }
 
   if (submitting && logged) {
@@ -140,29 +186,6 @@ const responseGoogle = (response: any) => {
   console.log(response);
 }
 
-function ProfileView() {
-  let [user, setUser] = useState({ name: '', email: '' })
-  let [unauthorized, setunAuthorized] = useState(false)
-  window.onload = async function () {
-    let v = await axios.get('http://localhost:1323/profile', { withCredentials: true })
-    if (v.status === 200) {
-      setUser({ name: v.data.name, email: v.data.email })
-    } else {
-      setunAuthorized(true)
-    }
-
-  }
-  if (unauthorized) {
-    return (<div>
-      Unauthorized 401
-    </div>)
-  } else {
-    return (<div>
-      {user.name ? "Hello" : "Page not shown? need to be refreshed maybe?"} {user.name} {user.email}
-    </div>)
-  }
-}
-
 function Signup() {
   const [submitting, setSubmitting] = useState(false);
   const [formdata, setformData] = useState<{
@@ -173,7 +196,7 @@ function Signup() {
   const [errors_msgs, setErrorsMsgs] = useState<{ name: string, email: string, password: string }>({ name: '', email: '', password: '' });
   const [errors_conds, setErrorsConds] = useState<{ name_err: boolean, email_err: boolean, password_err: boolean }>({ name_err: true, email_err: true, password_err: true });
   const [redirect, setRedirect] = useState(false);
-
+  const [login, setLogin] = useState(false);
   const [message, setMessage] = useState('');
 
   const handleSubmit = (event: { preventDefault: () => void; }) => {
@@ -192,7 +215,7 @@ function Signup() {
           setMessage("Signed up, will be redirected to login page...");
           setTimeout(() => {
             setRedirect(true)
-          }, 3000);
+          }, 200);
         }
 
         if (v.data.message === "Authorized") {
@@ -202,13 +225,8 @@ function Signup() {
     }
   }
 
-  window.onload = function () {
-    axios.get('http://localhost:1323/profile', { withCredentials: true }).then(function (v) {
-      if (v.status === 200) {
-        setRedirect(true)
-        setSubmitting(true)
-      }
-    })
+  if (login) {
+    return (<Navigate to="/" replace={true} />);
   }
 
   if (submitting && redirect) {
@@ -216,7 +234,7 @@ function Signup() {
   } else {
     return (
       <div>
-        <h1>Login</h1>
+        <h1>Signup</h1>
         {message}
         <div>
           <form>
@@ -279,6 +297,9 @@ function Signup() {
             {errors_msgs.password ? errors_msgs.password : ''}
           </form>
           <button onClick={handleSubmit}>Signup</button>
+          <button onClick={() => {
+            setLogin(true)
+          }}>Login</button>
           <GoogleLogin
             clientId="578732033166-4rvtsrgn4s5s0ppfrbqg46cd2ihtt71c.apps.googleusercontent.com"
             buttonText="Login with"

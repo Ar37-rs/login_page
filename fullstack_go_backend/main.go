@@ -60,17 +60,16 @@ func resetCookie(cookie *http.Cookie, c echo.Context) {
 	cookie.Expires = time.Unix(0, 0)
 	c.SetCookie(cookie)
 }
+
+func home(c echo.Context) error {
+	return nil
+}
+
 func main() {
 	e := echo.New()
-	e.Static("/", "build")
-	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowCredentials: true,
-		AllowOrigins: []string{
-			"http://localhost:3000",
-			"http://localhost:1323",
-		},
-		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
-	}))
+	cors := middleware.CORSConfig{}
+	cors.AllowCredentials = true
+	e.Use(middleware.CORSWithConfig(cors))
 	e.Validator = &CustomValidator{validator: validator.New()}
 
 	// masuk (login), akan redirected ke secret page jika authorized (difrontend).
@@ -116,6 +115,58 @@ func main() {
 		}
 	})
 
+	// halaman pendaftar, akan redirected ke secret page jika authorized (difrontend)
+	e.POST("/signup_api", func(c echo.Context) (err error) {
+		cookie, err := c.Cookie("username_logged")
+		if err == nil {
+			count := 0
+			db_im, _ := OpenDbIM()
+			rows, _ := db_im.Query("select email, status from logged")
+			for rows.Next() {
+				count += 1
+			}
+			rows.Close()
+			if count <= 0 {
+				resetCookie(cookie, c)
+			} else {
+				return c.JSON(http.StatusOK, OutMessage{Message: authorized})
+			}
+		}
+
+		user := new(User)
+		if err := c.Bind(user); err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+		if err := c.Validate(user); err != nil {
+			return c.JSON(http.StatusBadRequest, err.Error())
+		}
+		db, err := OpenDb()
+		if err != nil {
+			return c.String(http.StatusInternalServerError, err.Error())
+		}
+		defer db.Close()
+		accepted, msg := signupValidator(db, *user)
+		if accepted {
+			if err := InsertDB(db, *user); err != nil {
+				return c.JSON(http.StatusInternalServerError, internal_error)
+			} else {
+				println("User inserted into DB")
+			}
+			cookie := new(http.Cookie)
+			cookie.Name = "username_logged"
+			cookie.Value = user.Email
+			cookie.Expires = time.Now().Add(24 * time.Hour)
+			cookie.SameSite = http.SameSiteDefaultMode
+			c.SetCookie(cookie)
+			db_im, _ := OpenDbIM()
+			CreateTableIM(db_im)
+			InsertDBIM(db_im, LoggedInfo{Email: user.Email, Status: "logged"})
+			SelectAllDBIM(db_im)
+			return c.JSON(http.StatusOK, OutMessage{Message: msg})
+		}
+		return c.JSON(http.StatusOK, OutMessage{Message: msg})
+	})
+
 	// api logout
 	e.GET("/logout_api", func(c echo.Context) (err error) {
 		cookie, err := c.Cookie("username_logged")
@@ -140,7 +191,7 @@ func main() {
 			DeleteUserIM(db_im, email)
 			stmt.Close()
 		}
-		return c.JSON(http.StatusOK, "logout")
+		return c.JSON(http.StatusOK, OutMessage{Message: "Logged_out"})
 	})
 
 	// cek jika ada users yang masuk
@@ -199,58 +250,6 @@ func main() {
 			return c.JSON(http.StatusUnauthorized, OutMessage{Message: unauthorized})
 		}
 		return c.JSON(http.StatusOK, ProfileInfo{name, email})
-	})
-
-	// halaman pendaftar, akan redirected ke secret page jika authorized (difrontend)
-	e.POST("/signup_api", func(c echo.Context) (err error) {
-		cookie, err := c.Cookie("username_logged")
-		if err == nil {
-			count := 0
-			db_im, _ := OpenDbIM()
-			rows, _ := db_im.Query("select email, status from logged")
-			for rows.Next() {
-				count += 1
-			}
-			rows.Close()
-			if count <= 0 {
-				resetCookie(cookie, c)
-			} else {
-				return c.JSON(http.StatusOK, OutMessage{Message: authorized})
-			}
-		}
-
-		user := new(User)
-		if err := c.Bind(user); err != nil {
-			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-		}
-		if err := c.Validate(user); err != nil {
-			return c.JSON(http.StatusBadRequest, err.Error())
-		}
-		db, err := OpenDb()
-		if err != nil {
-			return c.String(http.StatusInternalServerError, err.Error())
-		}
-		defer db.Close()
-		accepted, msg := signupValidator(db, *user)
-		if accepted {
-			if err := InsertDB(db, *user); err != nil {
-				return c.JSON(http.StatusInternalServerError, internal_error)
-			} else {
-				println("User inserted into DB")
-			}
-			cookie := new(http.Cookie)
-			cookie.Name = "username_logged"
-			cookie.Value = user.Email
-			cookie.Expires = time.Now().Add(24 * time.Hour)
-			cookie.SameSite = http.SameSiteDefaultMode
-			c.SetCookie(cookie)
-			db_im, _ := OpenDbIM()
-			CreateTableIM(db_im)
-			InsertDBIM(db_im, LoggedInfo{Email: user.Email, Status: "logged"})
-			SelectAllDBIM(db_im)
-			return c.JSON(http.StatusOK, OutMessage{Message: msg})
-		}
-		return c.JSON(http.StatusOK, OutMessage{Message: msg})
 	})
 
 	e.Logger.Fatal(e.Start(":1323"))
