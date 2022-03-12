@@ -1,8 +1,11 @@
 package main
 
 import (
+	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"time"
 
@@ -10,6 +13,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	_ "github.com/mattn/go-sqlite3"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 )
 
 const authorized = "Authorized"
@@ -20,6 +25,9 @@ const unauthorized = "Unauthorized"
 const unregistered = "Unregistered"
 const signup_accepted = "SignupAccepted"
 const internal_error = "InternalErr"
+const oauth2_url_state = "test123"
+
+var Oauth2Config *oauth2.Config
 
 type (
 	User struct {
@@ -61,6 +69,76 @@ func resetCookie(cookie *http.Cookie, c echo.Context) {
 	c.SetCookie(cookie)
 }
 
+func GAuserInfo(state string, code string) (map[string]string, error) {
+	if state != oauth2_url_state {
+		return nil, fmt.Errorf("oauth2 state didn't match")
+	}
+
+	token, err := Oauth2Config.Exchange(context.TODO(), code)
+	if err != nil {
+		return nil, err
+	}
+
+	token.Expiry = time.Now().Add(24 * time.Hour)
+
+	res, err := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + token.AccessToken)
+	if err != nil {
+		return nil, err
+	}
+	contents, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+	data := make(map[string]string)
+	json.Unmarshal([]byte(contents), &data)
+	return data, nil
+}
+
+func handleRedirect(c echo.Context) error {
+	cookie, cookie_err := c.Cookie("username_logged")
+	if cookie_err == nil {
+		count := 0
+		db_im, _ := OpenDbIM()
+		rows, _ := db_im.Query("select email, status from logged")
+		for rows.Next() {
+			count += 1
+		}
+		rows.Close()
+		if count <= 0 {
+			resetCookie(cookie, c)
+		}
+	}
+
+	data, err := GAuserInfo(c.FormValue("state"), c.FormValue("code"))
+	if err != nil {
+		return c.String(http.StatusUnauthorized, unauthorized)
+	}
+	// untuk sentara password: data["id"] + data["name"]
+	user := User{Name: data["name"], Email: data["email"], Password: data["id"] + data["name"]}
+
+	if cookie_err != nil {
+		cookie = new(http.Cookie)
+		cookie.Name = "username_logged"
+		cookie.Value = user.Email
+		cookie.Expires = time.Now().Add(24 * time.Hour)
+		cookie.SameSite = http.SameSiteDefaultMode
+		c.SetCookie(cookie)
+		db_im, _ := OpenDbIM()
+		CreateTableIM(db_im)
+		InsertDBIM(db_im, LoggedInfo{Email: user.Email, Status: "logged"})
+		SelectAllDBIM(db_im)
+	}
+
+	return c.String(http.StatusOK, fmt.Sprintf("Hello %s %s", user.Name, user.Email))
+}
+
+func login_with_google(c echo.Context) error {
+	url := Oauth2Config.AuthCodeURL(oauth2_url_state)
+
+	// redirect ke GA auth
+	return c.Redirect(http.StatusTemporaryRedirect, url)
+}
+
 func main() {
 	e := echo.New()
 	cors := middleware.CORSConfig{}
@@ -68,7 +146,22 @@ func main() {
 	e.Use(middleware.CORSWithConfig(cors))
 	e.Validator = &CustomValidator{validator: validator.New()}
 
-	// masuk (login), akan redirected ke secret page jika authorized (difrontend).
+	// oauth2 config
+	Oauth2Config = &oauth2.Config{
+		RedirectURL:  "http://localhost:1323/auth/oauth2",
+		ClientID:     "578732033166-4rvtsrgn4s5s0ppfrbqg46cd2ihtt71c.apps.googleusercontent.com",
+		ClientSecret: "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",
+		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email"},
+		Endpoint:     google.Endpoint,
+	}
+
+	// login menggunakan google oauth2
+	e.GET("/login_with_google", login_with_google)
+
+	// oauth2: redirect sementara
+	e.GET("/auth/oauth2", handleRedirect)
+
+	// masuk (login) manual, akan redirected ke secret page jika authorized (difrontend).
 	e.POST("/login_api", func(c echo.Context) (err error) {
 		cookie, err := c.Cookie("username_logged")
 		if err == nil {
@@ -106,9 +199,9 @@ func main() {
 			InsertDBIM(db_im, LoggedInfo{Email: user.Email, Status: "logged"})
 			SelectAllDBIM(db_im)
 			return c.JSON(http.StatusOK, OutMessage{Message: msg})
-		} else {
-			return c.JSON(http.StatusOK, OutMessage{Message: msg})
 		}
+		return c.JSON(http.StatusOK, OutMessage{Message: msg})
+
 	})
 
 	// halaman pendaftar, akan redirected ke secret page jika authorized (difrontend)
@@ -124,9 +217,8 @@ func main() {
 			rows.Close()
 			if count <= 0 {
 				resetCookie(cookie, c)
-			} else {
-				return c.JSON(http.StatusOK, OutMessage{Message: authorized})
 			}
+			return c.JSON(http.StatusOK, OutMessage{Message: authorized})
 		}
 
 		user := new(User)
@@ -144,7 +236,7 @@ func main() {
 		accepted, msg := signupValidator(db, *user)
 		if accepted {
 			if err := InsertDB(db, *user); err != nil {
-				return c.JSON(http.StatusInternalServerError, internal_error)
+				return c.String(http.StatusInternalServerError, internal_error)
 			} else {
 				println("User inserted into DB")
 			}

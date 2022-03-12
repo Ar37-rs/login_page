@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { Routes, Route, Link, Navigate } from "react-router-dom";
-import { GoogleLogin } from 'react-google-login';
 import './App.css';
 import axios from 'axios';
 
@@ -23,28 +22,28 @@ function App() {
 }
 
 function ProfileView() {
-  let [user, setUser] = useState({ name: '', email: '' })
-  let [logged, setLogged] = useState(false)
-  let [logout, setLogout] = useState(false)
-  let [login, setLogin] = useState(false)
+  let [user, setUser] = useState({ name: '', email: '' });
+  let [logged, setLogged] = useState(false);
+  let [logout, setLogout] = useState(false);
+  let [login, setLogin] = useState(false);
 
   const handleLogout = (event: { preventDefault: () => void; }) => {
     event.preventDefault();
     axios.get('http://localhost:1323/logout_api', { withCredentials: true }).then(function (v) {
       if (v.data.message === "Logged_out") {
-        setLogout(true)
+        setLogout(true);
       }
     })
   }
 
   useEffect(() => {
     const timer = window.setInterval(async () => {
-      let v = await axios.get('http://localhost:1323/profile', { withCredentials: true })
+      let v = await axios.get('http://localhost:1323/profile', { withCredentials: true });
       if (v.status === 200) {
-        setUser({ name: v.data.name, email: v.data.email })
-        setLogged(true)
+        setUser({ name: v.data.name, email: v.data.email });
+        setLogged(true);
       } else {
-        setLogged(false)
+        setLogged(false);
       }
     }, 500);
     return () => {
@@ -61,7 +60,7 @@ function ProfileView() {
       <div>Unauthorized 401</div>
       <div>
         <button onClick={() => {
-          setLogin(true)
+          setLogin(true);
         }}>Login?</button>
       </div>
     </div>)
@@ -92,16 +91,16 @@ function Home() {
   const handleSubmit = (event: { preventDefault: () => void; }) => {
     event.preventDefault();
     setSubmitting(true);
-    let valid = !errors_conds.email_err ? !errors_conds.password_err ? true : false : false
+    let valid = !errors_conds.email_err ? !errors_conds.password_err ? true : false : false;
 
     if (valid) {
       axios.post('http://localhost:1323/login_api', formdata, { withCredentials: true }).then(function (v) {
         if (v.data.message === "InvalidPassword") {
-          setErrorsMsgs({ ...errors_msgs, password: "Invalid Password" })
-          setErrorsConds({ ...errors_conds, password_err: true })
+          setErrorsMsgs({ ...errors_msgs, password: "Invalid Password" });
+          setErrorsConds({ ...errors_conds, password_err: true });
         }
         if (v.data.message === "Logged") {
-          setLogged(true)
+          setLogged(true);
         }
 
         if (v.data.message === "Unregistered") {
@@ -109,7 +108,7 @@ function Home() {
         }
 
         if (v.data.message === "Authorized") {
-          setLogged(true)
+          setLogged(true);
         }
       })
     }
@@ -129,17 +128,17 @@ function Home() {
             <label>
               <p>Email</p>
               <input name="email" onChange={e => {
-                setSubmitting(false)
+                setSubmitting(false);
                 let value = e.target.value;
                 if (value === '') {
-                  setErrorsMsgs({ ...errors_msgs, email: 'Email can not be empty!' })
-                  setErrorsConds({ ...errors_conds, email_err: true })
+                  setErrorsMsgs({ ...errors_msgs, email: 'Email can not be empty!' });
+                  setErrorsConds({ ...errors_conds, email_err: true });
                 } else if (!/^[a-zA-Z0-9]+@(?:[a-zA-Z0-9]+\.)+[A-Za-z]+$/.test(value)) {
-                  setErrorsMsgs({ ...errors_msgs, email: 'Email invalid.' })
-                  setErrorsConds({ ...errors_conds, email_err: true })
+                  setErrorsMsgs({ ...errors_msgs, email: 'Email invalid.' });
+                  setErrorsConds({ ...errors_conds, email_err: true });
                 } else {
-                  setErrorsMsgs({ ...errors_msgs, email: '' })
-                  setErrorsConds({ ...errors_conds, email_err: false })
+                  setErrorsMsgs({ ...errors_msgs, email: '' });
+                  setErrorsConds({ ...errors_conds, email_err: false });
                   setformData({ ...formdata, email: value });
                 }
               }} />
@@ -148,17 +147,17 @@ function Home() {
             <label>
               <p>Password</p>
               <input name="password" onChange={e => {
-                setSubmitting(false)
+                setSubmitting(false);
                 let value = e.target.value;
                 if (value === '') {
                   setErrorsMsgs({ ...errors_msgs, password: 'Password can not be empty!' })
-                  setErrorsConds({ ...errors_conds, password_err: true })
+                  setErrorsConds({ ...errors_conds, password_err: true });
                 } else if (value.length < 6) {
                   setErrorsMsgs({ ...errors_msgs, password: 'Password length must >= 6 at least.' })
-                  setErrorsConds({ ...errors_conds, password_err: true })
+                  setErrorsConds({ ...errors_conds, password_err: true });
                 } else {
-                  setErrorsMsgs({ ...errors_msgs, password: '' })
-                  setErrorsConds({ ...errors_conds, password_err: false })
+                  setErrorsMsgs({ ...errors_msgs, password: '' });
+                  setErrorsConds({ ...errors_conds, password_err: false });
                   setformData({ ...formdata, password: value });
                 }
               }} />
@@ -167,23 +166,15 @@ function Home() {
           </form>
           <button onClick={handleSubmit}>Login</button>
           <button onClick={() => {
-            setSignup(true)
+            setSignup(true);
           }}>Signup</button>
-          <GoogleLogin
-            clientId="578732033166-4rvtsrgn4s5s0ppfrbqg46cd2ihtt71c.apps.googleusercontent.com"
-            buttonText="Login with"
-            onSuccess={responseGoogle}
-            onFailure={responseGoogle}
-            cookiePolicy={'single_host_origin'}
-          />
+          <button onClick={() => {
+            window.location.href='http://localhost:1323/login_with_google';
+          }}>Login with google</button>
         </div>
       </div>
     )
   }
-}
-
-const responseGoogle = (response: any) => {
-  console.log(response);
 }
 
 function Signup() {
@@ -202,24 +193,24 @@ function Signup() {
   const handleSubmit = (event: { preventDefault: () => void; }) => {
     event.preventDefault();
     setSubmitting(true);
-    let valid = !errors_conds.name_err ? !errors_conds.email_err ? !errors_conds.password_err ? true : false : false : false
+    let valid = !errors_conds.name_err ? !errors_conds.email_err ? !errors_conds.password_err ? true : false : false : false;
 
     if (valid) {
       axios.post('http://localhost:1323/signup_api', formdata, { withCredentials: true }).then(function (v) {
         if (v.data.message === "EmailTaken") {
-          setErrorsMsgs({ ...errors_msgs, email: "email is already taken!" })
-          setErrorsConds({ ...errors_conds, email_err: true })
+          setErrorsMsgs({ ...errors_msgs, email: "email is already taken!" });
+          setErrorsConds({ ...errors_conds, email_err: true });
           setMessage(v.data.message);
         }
         if (v.data.message === "SignupAccepted") {
           setMessage("Signed up, will be redirected to /profile_view");
           setTimeout(() => {
-            setRedirect(true)
+            setRedirect(true);
           }, 1000);
         }
 
         if (v.data.message === "Authorized") {
-          setRedirect(true)
+          setRedirect(true);
         }
       })
     }
@@ -244,14 +235,14 @@ function Signup() {
                 setSubmitting(false)
                 let value = e.target.value;
                 if (value === '') {
-                  setErrorsMsgs({ ...errors_msgs, name: 'Username can not be empty!' })
-                  setErrorsConds({ ...errors_conds, email_err: true })
+                  setErrorsMsgs({ ...errors_msgs, name: 'Username can not be empty!' });
+                  setErrorsConds({ ...errors_conds, email_err: true });
                 } else if (value.length < 3) {
-                  setErrorsMsgs({ ...errors_msgs, name: 'Username must contains 3 of chars at least.' })
-                  setErrorsConds({ ...errors_conds, name_err: true })
+                  setErrorsMsgs({ ...errors_msgs, name: 'Username must contains 3 of chars at least.' });
+                  setErrorsConds({ ...errors_conds, name_err: true });
                 } else {
-                  setErrorsMsgs({ ...errors_msgs, name: '' })
-                  setErrorsConds({ ...errors_conds, name_err: false })
+                  setErrorsMsgs({ ...errors_msgs, name: '' });
+                  setErrorsConds({ ...errors_conds, name_err: false });
                   setformData({ ...formdata, name: value });
                 }
               }} />
@@ -260,17 +251,17 @@ function Signup() {
             <label>
               <p>Email</p>
               <input name="email" onChange={e => {
-                setSubmitting(false)
+                setSubmitting(false);
                 let value = e.target.value;
                 if (value === '') {
                   setErrorsMsgs({ ...errors_msgs, email: 'Email can not be empty!' })
-                  setErrorsConds({ ...errors_conds, email_err: true })
+                  setErrorsConds({ ...errors_conds, email_err: true });
                 } else if (!/^[a-zA-Z0-9]+@(?:[a-zA-Z0-9]+\.)+[A-Za-z]+$/.test(value)) {
                   setErrorsMsgs({ ...errors_msgs, email: 'Email invalid.' });
-                  setErrorsConds({ ...errors_conds, email_err: true })
+                  setErrorsConds({ ...errors_conds, email_err: true });
                 } else {
-                  setErrorsMsgs({ ...errors_msgs, email: '' })
-                  setErrorsConds({ ...errors_conds, email_err: false })
+                  setErrorsMsgs({ ...errors_msgs, email: '' });
+                  setErrorsConds({ ...errors_conds, email_err: false });
                   setformData({ ...formdata, email: value });
                 }
               }} />
@@ -279,17 +270,17 @@ function Signup() {
             <label>
               <p>Password</p>
               <input name="password" onChange={e => {
-                setSubmitting(false)
+                setSubmitting(false);
                 let value = e.target.value;
                 if (value === '') {
-                  setErrorsMsgs({ ...errors_msgs, password: 'Password can not be empty!' })
-                  setErrorsConds({ ...errors_conds, password_err: true })
+                  setErrorsMsgs({ ...errors_msgs, password: 'Password can not be empty!' });
+                  setErrorsConds({ ...errors_conds, password_err: true });
                 } else if (value.length < 6) {
-                  setErrorsMsgs({ ...errors_msgs, password: 'Password length must >= 6 at least.' })
-                  setErrorsConds({ ...errors_conds, password_err: true })
+                  setErrorsMsgs({ ...errors_msgs, password: 'Password length must >= 6 at least.' });
+                  setErrorsConds({ ...errors_conds, password_err: true });
                 } else {
-                  setErrorsMsgs({ ...errors_msgs, password: '' })
-                  setErrorsConds({ ...errors_conds, password_err: false })
+                  setErrorsMsgs({ ...errors_msgs, password: '' });
+                  setErrorsConds({ ...errors_conds, password_err: false });
                   setformData({ ...formdata, password: value });
                 }
               }} />
@@ -298,15 +289,11 @@ function Signup() {
           </form>
           <button onClick={handleSubmit}>Signup</button>
           <button onClick={() => {
-            setLogin(true)
+            setLogin(true);
           }}>Login</button>
-          <GoogleLogin
-            clientId="578732033166-4rvtsrgn4s5s0ppfrbqg46cd2ihtt71c.apps.googleusercontent.com"
-            buttonText="Login with"
-            onSuccess={responseGoogle}
-            onFailure={responseGoogle}
-            cookiePolicy={'single_host_origin'}
-          />
+          <button onClick={() => {
+            window.location.href='http://localhost:1323/login_with_google';
+          }}>Login with google</button>
         </div>
       </div>
     )
