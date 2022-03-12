@@ -29,6 +29,14 @@ const oauth2_url_state = "test123"
 
 var Oauth2Config *oauth2.Config
 
+const page = `
+<br />
+<br />
+<button onclick="location.href='http://localhost:3000';">
+Try Login
+</button>
+`
+
 type (
 	User struct {
 		Name     string `json:"name"`
@@ -79,8 +87,6 @@ func GAuserInfo(state string, code string) (map[string]string, error) {
 		return nil, err
 	}
 
-	token.Expiry = time.Now().Add(24 * time.Hour)
-
 	res, err := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + token.AccessToken)
 	if err != nil {
 		return nil, err
@@ -95,41 +101,27 @@ func GAuserInfo(state string, code string) (map[string]string, error) {
 }
 
 func handleRedirect(c echo.Context) error {
-	cookie, cookie_err := c.Cookie("username_logged")
-	if cookie_err == nil {
-		count := 0
-		db_im, _ := OpenDbIM()
-		rows, _ := db_im.Query("select email, status from logged")
-		for rows.Next() {
-			count += 1
-		}
-		rows.Close()
-		if count <= 0 {
-			resetCookie(cookie, c)
-		}
-	}
-
 	data, err := GAuserInfo(c.FormValue("state"), c.FormValue("code"))
 	if err != nil {
-		return c.String(http.StatusUnauthorized, unauthorized)
+		return c.String(http.StatusUnauthorized, "Timeout")
 	}
+
 	// untuk sentara password: data["id"] + data["name"]
-	user := User{Name: data["name"], Email: data["email"], Password: data["id"] + data["name"]}
-
-	if cookie_err != nil {
-		cookie = new(http.Cookie)
-		cookie.Name = "username_logged"
-		cookie.Value = user.Email
-		cookie.Expires = time.Now().Add(24 * time.Hour)
-		cookie.SameSite = http.SameSiteDefaultMode
-		c.SetCookie(cookie)
-		db_im, _ := OpenDbIM()
-		CreateTableIM(db_im)
-		InsertDBIM(db_im, LoggedInfo{Email: user.Email, Status: "logged"})
-		SelectAllDBIM(db_im)
+	pass := data["id"] + data["family_name"]
+	user := User{Name: data["name"], Email: data["email"], Password: pass}
+	db, err := OpenDb()
+	if err != nil {
+		return c.String(http.StatusInternalServerError, err.Error())
 	}
-
-	return c.String(http.StatusOK, fmt.Sprintf("Hello %s %s", user.Name, user.Email))
+	accepted, _ := signupValidator(db, user)
+	if accepted {
+		if err := InsertDB(db, user); err != nil {
+			return c.String(http.StatusInternalServerError, internal_error)
+		} else {
+			println("User inserted into DB")
+		}
+	}
+	return c.HTML(http.StatusOK, fmt.Sprintf("Hi %s, <br /> %s <br /> use: '%s' as your login password.", user.Name, user.Email, pass)+page)
 }
 
 func login_with_google(c echo.Context) error {
@@ -184,7 +176,10 @@ func main() {
 		if err := c.Validate(user); err != nil {
 			return err
 		}
-		db, _ := OpenDb()
+		db, err := OpenDb()
+		if err != nil {
+			return c.String(http.StatusInternalServerError, err.Error())
+		}
 		defer db.Close()
 		_, msg, _ := loginValidator(db, *user)
 		if msg == logged {

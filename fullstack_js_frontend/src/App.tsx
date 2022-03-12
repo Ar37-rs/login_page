@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { Routes, Route, Link, Navigate } from "react-router-dom";
 import './App.css';
 import axios from 'axios';
@@ -19,6 +19,43 @@ function App() {
       </Routes>
     </div>
   );
+}
+
+interface UnAuthProps {
+  setLogin: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const UnAuth: FC<UnAuthProps> = (prop) => {
+  return (<div>
+    <div>Unauthorized 401</div>
+    <div>
+      <br />
+      <button onClick={() => {
+        prop.setLogin(true);
+      }}>Login?</button>
+    </div>
+  </div>)
+}
+
+interface AuthorizedProps {
+  user: {
+    name: string,
+    email: string
+  };
+  handleLogout: (event: { preventDefault: () => void; }) => void;
+}
+
+const Authorized: FC<AuthorizedProps> = (prop) => {
+  return (<div>
+    <div>
+      <div>{prop.user.name ? "Hello" : "Loading..."} {prop.user.name} {prop.user.email}</div>
+      <div>congratulations, you are logged in. 😨</div>
+      <br />
+      <div>
+        <button onClick={prop.handleLogout}>Logout?</button>
+      </div>
+    </div>
+  </div>)
 }
 
 function ProfileView() {
@@ -55,25 +92,11 @@ function ProfileView() {
     return (<Navigate to="/" replace={true} />);
   }
 
-  if (!logged) {
-    return (<div>
-      <div>Unauthorized 401</div>
-      <div>
-        <button onClick={() => {
-          setLogin(true);
-        }}>Login?</button>
-      </div>
-    </div>)
-  } else {
-    return (
-      <div>
-        <div>{user.name ? "Hello" : "Loading..."} {user.name} {user.email}</div>
-        <div>
-          <button onClick={handleLogout}>Logout?</button>
-        </div>
-      </div>
-    )
-  }
+  return (
+    <div>
+      {logged ? <Authorized user={user} handleLogout={handleLogout}></Authorized> : <UnAuth setLogin={setLogin}></UnAuth>}
+    </div>
+  )
 }
 
 function Home() {
@@ -87,6 +110,7 @@ function Home() {
   const [signup, setSignup] = useState(false);
   const [logged, setLogged] = useState(false);
   const [message, setMessage] = useState('');
+  const [showpassword, setShowPassword] = useState('password');
 
   const handleSubmit = (event: { preventDefault: () => void; }) => {
     event.preventDefault();
@@ -146,7 +170,7 @@ function Home() {
             <div>{errors_msgs.email ? errors_msgs.email : ''}</div>
             <label>
               <p>Password</p>
-              <input name="password" onChange={e => {
+              <input name="password" type={showpassword} onChange={e => {
                 setSubmitting(false);
                 let value = e.target.value;
                 if (value === '') {
@@ -161,16 +185,28 @@ function Home() {
                   setformData({ ...formdata, password: value });
                 }
               }} />
+              <div>
+                <input type="checkbox" onClick={() => {
+                  if (showpassword == "password") {
+                    setShowPassword("text")
+                  } else {
+                    setShowPassword("password")
+                  }
+                }} /> {showpassword === "password" ? "Show" : "Hide"} password?
+              </div>
             </label>
             <div>{errors_msgs.password ? errors_msgs.password : ''}</div>
           </form>
-          <button onClick={handleSubmit}>Login</button>
-          <button onClick={() => {
-            setSignup(true);
-          }}>Signup</button>
-          <button onClick={() => {
-            window.location.href='http://localhost:1323/login_with_google';
-          }}>Login with google</button>
+          <br />
+          <div>
+            <button onClick={handleSubmit}>Login</button>
+            <button onClick={() => {
+              setSignup(true);
+            }}>Signup</button>
+            <button onClick={() => {
+              window.location.href = 'http://localhost:1323/login_with_google';
+            }}>Login with google</button>
+          </div>
         </div>
       </div>
     )
@@ -189,6 +225,7 @@ function Signup() {
   const [redirect, setRedirect] = useState(false);
   const [login, setLogin] = useState(false);
   const [message, setMessage] = useState('');
+  const [showpassword, setShowPassword] = useState('password');
 
   const handleSubmit = (event: { preventDefault: () => void; }) => {
     event.preventDefault();
@@ -198,7 +235,7 @@ function Signup() {
     if (valid) {
       axios.post('http://localhost:1323/signup_api', formdata, { withCredentials: true }).then(function (v) {
         if (v.data.message === "EmailTaken") {
-          setErrorsMsgs({ ...errors_msgs, email: "email is already taken!" });
+          setErrorsMsgs({ ...errors_msgs, email: "Email is already taken!" });
           setErrorsConds({ ...errors_conds, email_err: true });
           setMessage(v.data.message);
         }
@@ -269,7 +306,7 @@ function Signup() {
             <div>{errors_msgs.email ? errors_msgs.email : ''}</div>
             <label>
               <p>Password</p>
-              <input name="password" onChange={e => {
+              <input name="password" type={showpassword} onChange={e => {
                 setSubmitting(false);
                 let value = e.target.value;
                 if (value === '') {
@@ -284,16 +321,28 @@ function Signup() {
                   setformData({ ...formdata, password: value });
                 }
               }} />
+              <div>
+                <input type="checkbox" onClick={() => {
+                  if (showpassword == "password") {
+                    setShowPassword("text")
+                  } else {
+                    setShowPassword("password")
+                  }
+                }} /> {showpassword === "password" ? "Show" : "Hide"} password?
+              </div>
             </label>
             <div>{errors_msgs.password ? errors_msgs.password : ''}</div>
           </form>
-          <button onClick={handleSubmit}>Signup</button>
-          <button onClick={() => {
-            setLogin(true);
-          }}>Login</button>
-          <button onClick={() => {
-            window.location.href='http://localhost:1323/login_with_google';
-          }}>Login with google</button>
+          <br />
+          <div>
+            <button onClick={handleSubmit}>Signup</button>
+            <button onClick={() => {
+              setLogin(true);
+            }}>Login</button>
+            <button onClick={() => {
+              window.location.href = 'http://localhost:1323/login_with_google';
+            }}>Login with google</button>
+          </div>
         </div>
       </div>
     )
