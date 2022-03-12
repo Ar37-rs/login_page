@@ -61,10 +61,6 @@ func resetCookie(cookie *http.Cookie, c echo.Context) {
 	c.SetCookie(cookie)
 }
 
-func home(c echo.Context) error {
-	return nil
-}
-
 func main() {
 	e := echo.New()
 	cors := middleware.CORSConfig{}
