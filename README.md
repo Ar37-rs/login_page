@@ -1,4 +1,4 @@
-# WIP - fullstack_adya_roby
+# Fullstack_adya_roby
 
 Clone repo:
 
