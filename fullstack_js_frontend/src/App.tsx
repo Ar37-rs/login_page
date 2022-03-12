@@ -212,7 +212,7 @@ function Signup() {
           setMessage(v.data.message);
         }
         if (v.data.message === "SignupAccepted") {
-          setMessage("Signed up, will be redirected to login page...");
+          setMessage("Signed up, will be redirected to /profile_view");
           setTimeout(() => {
             setRedirect(true)
           }, 200);
