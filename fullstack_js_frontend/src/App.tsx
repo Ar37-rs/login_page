@@ -144,7 +144,7 @@ function Home() {
                 }
               }} />
             </label>
-            {errors_msgs.email ? errors_msgs.email : ''}
+            <div>{errors_msgs.email ? errors_msgs.email : ''}</div>
             <label>
               <p>Password</p>
               <input name="password" onChange={e => {
@@ -163,7 +163,7 @@ function Home() {
                 }
               }} />
             </label>
-            {errors_msgs.password ? errors_msgs.password : ''}
+            <div>{errors_msgs.password ? errors_msgs.password : ''}</div>
           </form>
           <button onClick={handleSubmit}>Login</button>
           <button onClick={() => {
@@ -215,7 +215,7 @@ function Signup() {
           setMessage("Signed up, will be redirected to /profile_view");
           setTimeout(() => {
             setRedirect(true)
-          }, 200);
+          }, 1000);
         }
 
         if (v.data.message === "Authorized") {
@@ -256,7 +256,7 @@ function Signup() {
                 }
               }} />
             </label>
-            {errors_msgs.name ? errors_msgs.name : ''}
+            <div>{errors_msgs.name ? errors_msgs.name : ''}</div>
             <label>
               <p>Email</p>
               <input name="email" onChange={e => {
@@ -275,7 +275,7 @@ function Signup() {
                 }
               }} />
             </label>
-            {errors_msgs.email ? errors_msgs.email : ''}
+            <div>{errors_msgs.email ? errors_msgs.email : ''}</div>
             <label>
               <p>Password</p>
               <input name="password" onChange={e => {
@@ -294,7 +294,7 @@ function Signup() {
                 }
               }} />
             </label>
-            {errors_msgs.password ? errors_msgs.password : ''}
+            <div>{errors_msgs.password ? errors_msgs.password : ''}</div>
           </form>
           <button onClick={handleSubmit}>Signup</button>
           <button onClick={() => {
