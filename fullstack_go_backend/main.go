@@ -29,26 +29,6 @@ const oauth2_url_state = "test123"
 
 var Oauth2Config *oauth2.Config
 
-const page = `
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#000000" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-    crossorigin="anonymous"></script>
-  <title>Mini login app - IP Test</title>
-</head>
-
-<br />
-<br />
-<button class="btn btn-primary" onclick="location.href='http://localhost:3000';">
-Try Login
-</button>
-`
-
 type (
 	User struct {
 		Name     string `json:"name"`
@@ -143,10 +123,32 @@ func login_with_google(c echo.Context) error {
 	return c.Redirect(http.StatusTemporaryRedirect, url)
 }
 
+const page = `
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#000000" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+    crossorigin="anonymous"></script>
+  <title>Mini login app - IP Test</title>
+</head>
+
+<br />
+<br />
+<! –– ubah location.href value 'http://localhost:3000' ke 'http://localhost:1323' apabila menggunakan static file pre-build.  ––>
+<button class="btn btn-primary" onclick="location.href='http://localhost:3000';">
+Try Login
+</button>
+`
+
 func main() {
 	e := echo.New()
-	// bisa menggunakan static file, tetapi echo routes "Not Found" apabila halaman direfresh,
-	// kurangnya koordinasi antara react router dan echo routing mungkin?
+	// bisa menggunakan static file pre-build, tetapi echo routes "Not Found" apabila halaman direfresh,
+	// kurangnya koordinasi antara react router dan echo routing mungkin? atau mungkin saya belum begitu paham tentang bagaimana cara mengatur cookie?
+	// masih menjadi PR.
 	// e.Static("/", "build")
 	cors := middleware.CORSConfig{}
 	cors.AllowCredentials = true
