@@ -24,3 +24,7 @@ npm start
 ```
 
 kemudian buka http://localhost:3000
+
+# Flowchart
+
+![alt_test](image/flowchart.svg)
