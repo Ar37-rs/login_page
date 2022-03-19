@@ -1,5 +1,7 @@
 # Login page + google oauth2 
 
+[![CI](https://github.com/Ar37-rs/login_page_plus_oauth2/actions/workflows/go.yml/badge.svg)](https://github.com/Ar37-rs/login_page_plus_oauth2/actions/workflows/go.yml)
+
 Clone repo:
 
 ```bash
