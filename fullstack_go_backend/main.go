@@ -6,9 +6,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"regexp"
 	"time"
 
+	rice "github.com/GeertJohan/go.rice"
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -64,9 +67,33 @@ func (cv *CustomValidator) Validate(i interface{}) error {
 
 func resetCookie(cookie *http.Cookie, c echo.Context) {
 	cookie.Name = "username_logged"
+	cookie.Path = "/"
 	cookie.Value = ""
 	cookie.Expires = time.Unix(0, 0)
 	c.SetCookie(cookie)
+}
+
+func setCookie(cookie *http.Cookie, user User, c echo.Context) {
+	cookie.Name = "username_logged"
+	cookie.Path = "/"
+	cookie.Value = user.Email
+	cookie.Expires = time.Now().Add(24 * time.Hour)
+	cookie.SameSite = http.SameSiteDefaultMode
+	c.SetCookie(cookie)
+}
+
+func addUserOnline(user User) {
+	db_im, _ := OpenDbIM()
+	CreateTableIM(db_im)
+	InsertDBIM(db_im, LoggedInfo{Email: user.Email, Status: "logged"})
+	SelectAllDBIM(db_im)
+}
+
+func login_with_google(c echo.Context) error {
+	url := Oauth2Config.AuthCodeURL(oauth2_url_state)
+
+	// redirect to GA
+	return c.Redirect(http.StatusTemporaryRedirect, url)
 }
 
 func GAuserInfo(state string, code string) (map[string]string, error) {
@@ -74,6 +101,7 @@ func GAuserInfo(state string, code string) (map[string]string, error) {
 		return nil, fmt.Errorf("oauth2 state didn't match")
 	}
 
+	// exchange token
 	token, err := Oauth2Config.Exchange(context.TODO(), code)
 	if err != nil {
 		return nil, err
@@ -92,13 +120,29 @@ func GAuserInfo(state string, code string) (map[string]string, error) {
 	return data, nil
 }
 
+// handle oauth2 redirect
 func handleRedirect(c echo.Context) error {
+	cookie, err := c.Cookie("username_logged")
+	if err == nil {
+		count := 0
+		db_im, _ := OpenDbIM()
+		rows, _ := db_im.Query("select email, status from logged")
+		for rows.Next() {
+			count += 1
+		}
+		rows.Close()
+		if count <= 0 {
+			resetCookie(cookie, c)
+		} else {
+			return c.Redirect(http.StatusTemporaryRedirect, "/profile_view")
+		}
+	}
 	data, err := GAuserInfo(c.FormValue("state"), c.FormValue("code"))
 	if err != nil {
 		return c.String(http.StatusUnauthorized, "Timeout")
 	}
 
-	// untuk sentara password: data["id"] + data["name"]
+	// for temporary password: data["id"] + data["name"]
 	pass := data["id"] + data["family_name"]
 	user := User{Name: data["name"], Email: data["email"], Password: pass}
 	db, err := OpenDb()
@@ -113,43 +157,40 @@ func handleRedirect(c echo.Context) error {
 			println("User inserted into DB")
 		}
 	}
-	return c.HTML(http.StatusOK, fmt.Sprintf("Hi %s, <br /> %s <br /> use: '%s' as your login password.", user.Name, user.Email, pass)+page)
+	cookie = new(http.Cookie)
+	setCookie(cookie, user, c)
+	addUserOnline(user)
+	return c.Redirect(http.StatusTemporaryRedirect, "/profile_view")
 }
 
-func login_with_google(c echo.Context) error {
-	url := Oauth2Config.AuthCodeURL(oauth2_url_state)
+// to make SPA refresh work with go backend
+func serveSPA(e *echo.Echo) {
+	box, err := rice.FindBox("/build")
+	if err != nil {
+		log.Fatal("Unable to load SPA assets")
+	}
 
-	// redirect ke GA auth
-	return c.Redirect(http.StatusTemporaryRedirect, url)
+	file, err := box.String("index.html")
+
+	if err != nil {
+		log.Fatalf("could not open file: %s\n", err)
+	}
+
+	assetHandler := http.FileServer(box.HTTPBox())
+	e.GET("*", echo.WrapHandler(assetHandler), func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			matchAssets := regexp.MustCompile(`(.*)\.(js|png|json|ico|txt|css|svg)$`)
+			if matchAssets.MatchString(c.Request().URL.RequestURI()) == true {
+				return next(c)
+			}
+			return c.HTML(http.StatusOK, file)
+		}
+	})
 }
-
-const page = `
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#000000" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-    crossorigin="anonymous"></script>
-  <title>Mini login app - IP Test</title>
-</head>
-
-<br />
-<br />
-<! –– ubah location.href value 'http://localhost:3000' ke 'http://localhost:1323' apabila menggunakan static file pre-build.  ––>
-<button class="btn btn-primary" onclick="location.href='http://localhost:3000';">
-Try Login
-</button>
-`
 
 func main() {
 	e := echo.New()
-	// bisa menggunakan static file pre-build, tetapi echo routes "Not Found" apabila halaman direfresh,
-	// kurangnya koordinasi antara react router dan echo routing mungkin? atau mungkin saya belum begitu paham tentang bagaimana cara mengatur cookie?
-	// masih menjadi PR.
-	// e.Static("/", "build")
+	serveSPA(e)
 	cors := middleware.CORSConfig{}
 	cors.AllowCredentials = true
 	e.Use(middleware.CORSWithConfig(cors))
@@ -164,13 +205,13 @@ func main() {
 		Endpoint:     google.Endpoint,
 	}
 
-	// login menggunakan google oauth2
+	// login using google oauth2
 	e.GET("/login_with_google", login_with_google)
 
-	// oauth2: redirect sementara
+	// oauth2: temporary redirect
 	e.GET("/auth/oauth2", handleRedirect)
 
-	// masuk (login) manual, akan redirected ke secret page jika authorized (difrontend).
+	// login manually, will be redirected to secret page if authorized (/profile_view).
 	e.POST("/login_api", func(c echo.Context) (err error) {
 		cookie, err := c.Cookie("username_logged")
 		if err == nil {
@@ -183,8 +224,9 @@ func main() {
 			rows.Close()
 			if count <= 0 {
 				resetCookie(cookie, c)
+			} else {
+				return c.JSON(http.StatusOK, OutMessage{Message: authorized})
 			}
-			return c.JSON(http.StatusOK, OutMessage{Message: authorized})
 		}
 		user := new(User)
 		if err := c.Bind(user); err != nil {
@@ -198,25 +240,18 @@ func main() {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
 		defer db.Close()
-		_, msg, _ := loginValidator(db, *user)
+		_, msg := loginValidator(db, *user)
 		if msg == logged {
 			cookie := new(http.Cookie)
-			cookie.Name = "username_logged"
-			cookie.Value = user.Email
-			cookie.Expires = time.Now().Add(24 * time.Hour)
-			cookie.SameSite = http.SameSiteDefaultMode
-			c.SetCookie(cookie)
-			db_im, _ := OpenDbIM()
-			CreateTableIM(db_im)
-			InsertDBIM(db_im, LoggedInfo{Email: user.Email, Status: "logged"})
-			SelectAllDBIM(db_im)
+			setCookie(cookie, *user, c)
+			addUserOnline(*user)
 			return c.JSON(http.StatusOK, OutMessage{Message: msg})
 		}
 		return c.JSON(http.StatusOK, OutMessage{Message: msg})
 
 	})
 
-	// halaman pendaftar, akan redirected ke secret page jika authorized (difrontend)
+	// signup page, will be redirected to secret page if authorized (/profile_view).
 	e.POST("/signup_api", func(c echo.Context) (err error) {
 		cookie, err := c.Cookie("username_logged")
 		if err == nil {
@@ -229,8 +264,9 @@ func main() {
 			rows.Close()
 			if count <= 0 {
 				resetCookie(cookie, c)
+			} else {
+				return c.JSON(http.StatusOK, OutMessage{Message: authorized})
 			}
-			return c.JSON(http.StatusOK, OutMessage{Message: authorized})
 		}
 
 		user := new(User)
@@ -253,21 +289,14 @@ func main() {
 				println("User inserted into DB")
 			}
 			cookie := new(http.Cookie)
-			cookie.Name = "username_logged"
-			cookie.Value = user.Email
-			cookie.Expires = time.Now().Add(24 * time.Hour)
-			cookie.SameSite = http.SameSiteDefaultMode
-			c.SetCookie(cookie)
-			db_im, _ := OpenDbIM()
-			CreateTableIM(db_im)
-			InsertDBIM(db_im, LoggedInfo{Email: user.Email, Status: "logged"})
-			SelectAllDBIM(db_im)
+			setCookie(cookie, *user, c)
+			addUserOnline(*user)
 			return c.JSON(http.StatusOK, OutMessage{Message: msg})
 		}
 		return c.JSON(http.StatusOK, OutMessage{Message: msg})
 	})
 
-	// api logout
+	// logout API
 	e.GET("/logout_api", func(c echo.Context) (err error) {
 		cookie, err := c.Cookie("username_logged")
 		if err != nil {
@@ -281,20 +310,17 @@ func main() {
 		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
+		defer stmt.Close()
 		var email string
 		err = stmt.QueryRow(cookie.Value).Scan(&email)
-		cookie.Name = "username_logged"
-		cookie.Value = ""
-		cookie.Expires = time.Unix(0, 0)
-		c.SetCookie(cookie)
+		resetCookie(cookie, c)
 		if err == nil {
 			DeleteUserIM(db_im, email)
-			stmt.Close()
 		}
 		return c.JSON(http.StatusOK, OutMessage{Message: "Logged_out"})
 	})
 
-	// cek jika ada users yang masuk
+	// check if there's users online
 	e.GET("/users_logged", func(c echo.Context) (err error) {
 		db, err := OpenDbIM()
 		if err != nil {
@@ -315,7 +341,7 @@ func main() {
 		return c.JSON(http.StatusOK, users_logged)
 	})
 
-	// halaman secret page.
+	// secret page API
 	e.GET("/profile", func(c echo.Context) (err error) {
 		cookie, err := c.Cookie("username_logged")
 		if err != nil {
@@ -420,7 +446,7 @@ func InsertDB(db *sql.DB, user User) error {
 
 // Insert user into databse in memory
 func InsertDBIM(db *sql.DB, logged_info LoggedInfo) error {
-	// beging
+	// begin
 	tx, err := db.Begin()
 	if err != nil {
 		return err
@@ -429,10 +455,10 @@ func InsertDBIM(db *sql.DB, logged_info LoggedInfo) error {
 	if err != nil {
 		return err
 	}
+	defer stmt_logged.Close()
 	var email string
 	stmt_logged_err := stmt_logged.QueryRow(logged_info.Email).Scan(&email)
 	if stmt_logged_err != nil {
-		stmt_logged.Close()
 		stmt, err := tx.Prepare("insert into logged(email, status) values(?, ?)")
 		if err != nil {
 			return err
@@ -489,11 +515,11 @@ func SelectAllDB(db *sql.DB, user User) error {
 }
 
 // Validate login
-func loginValidator(db *sql.DB, user User) (bool, string, string) {
-	// // query
+func loginValidator(db *sql.DB, user User) (bool, string) {
+	// query
 	stmt, err := db.Prepare("select * from users where email = ?")
 	if err != nil {
-		return false, internal_error, ""
+		return false, internal_error
 	}
 	defer stmt.Close()
 	var name string
@@ -501,15 +527,15 @@ func loginValidator(db *sql.DB, user User) (bool, string, string) {
 	var password string
 	err = stmt.QueryRow(user.Email).Scan(&name, &email, &password)
 	if err != nil {
-		return false, unregistered, ""
+		return false, unregistered
 	}
 
 	if email == user.Email && password != user.Password {
-		return false, invalid_password, ""
+		return false, invalid_password
 	} else if email == user.Email && password == user.Password {
-		return true, logged, name
+		return true, logged
 	} else {
-		return false, unregistered, ""
+		return false, unregistered
 	}
 }
 

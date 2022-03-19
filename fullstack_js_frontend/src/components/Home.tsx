@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { Navigate } from "react-router-dom";
 import axios from 'axios';
-import GoogleBtn from './GoogleBtn.svg';
+
 function Home() {
-  const [submitting, setSubmitting] = useState(false);
   const [formdata, setformData] = useState<{
     email: string;
     password: string;
@@ -12,13 +11,15 @@ function Home() {
   const [errors_conds, setErrorsConds] = useState<{ email_err: boolean, password_err: boolean }>({ email_err: true, password_err: true });
   const [neterror, setNeterror] = useState('');
   const [signup, setSignup] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const [logged, setLogged] = useState(false);
-  const [_message, setMessage] = useState('');
+  const [message, setMessage] = useState('');
   const [showpassword, setShowPassword] = useState("password");
 
   const handleSubmit = (event: { preventDefault: () => void; }) => {
     event.preventDefault();
-    setSubmitting(true);
+    setSubmitted(true);
+
     let valid = !errors_conds.email_err ? !errors_conds.password_err ? true : false : false;
 
     if (valid) {
@@ -39,12 +40,14 @@ function Home() {
           setLogged(true);
         }
       }, function (error) {
-        setNeterror(error.message)
+        setNeterror(error.message);
       })
+    } else {
+      setMessage("Please fill the required fields!");
     }
   }
 
-  if (submitting && logged) {
+  if (submitted && logged) {
     return (<Navigate to="/profile_view" replace={true} />);
   } else if (signup) {
     return (<Navigate to="/signup" replace={true} />);
@@ -53,18 +56,20 @@ function Home() {
       <div>
         <h1>Login {neterror}</h1>
         <div>
+          <div>{message}</div>
           <form>
             <div className="mb-3">
               <label className="form-label">
                 <p>Email</p>
                 <input className="form-control" name="email" onChange={e => {
-                  setSubmitting(false);
+                  setSubmitted(false);
+                  setMessage('');
                   let value = e.target.value;
                   if (value === '') {
-                    setErrorsMsgs({ ...errors_msgs, email: 'Email can not be empty!' });
+                    setErrorsMsgs({ ...errors_msgs, email: "Email can not be empty!" });
                     setErrorsConds({ ...errors_conds, email_err: true });
                   } else if (!/^[a-zA-Z0-9]+@(?:[a-zA-Z0-9]+\.)+[A-Za-z]+$/.test(value)) {
-                    setErrorsMsgs({ ...errors_msgs, email: 'Email invalid.' });
+                    setErrorsMsgs({ ...errors_msgs, email: "Make sure to use vaild email." });
                     setErrorsConds({ ...errors_conds, email_err: true });
                   } else {
                     setErrorsMsgs({ ...errors_msgs, email: '' });
@@ -77,7 +82,8 @@ function Home() {
               <label className="form-label">
                 <p>Password</p>
                 <input className="form-control" name="password" type={showpassword} onChange={e => {
-                  setSubmitting(false);
+                  setSubmitted(false);
+                  setMessage('');
                   let value = e.target.value;
                   if (value === '') {
                     setErrorsMsgs({ ...errors_msgs, password: "Password can not be empty!" })
@@ -94,9 +100,9 @@ function Home() {
                 <div className="mb-3 form-check">
                   <input type="checkbox" className="form-check-input" onClick={() => {
                     if (showpassword == "password") {
-                      setShowPassword("text")
+                      setShowPassword("text");
                     } else {
-                      setShowPassword("password")
+                      setShowPassword("password");
                     }
                   }} />
                   {showpassword === "password" ? "Show" : "Hide"} password?
@@ -113,7 +119,7 @@ function Home() {
             }}>Signup</button>
             <img src="/GoogleBtn.svg" id="clickable-img" onClick={() => {
               window.location.href = 'http://localhost:1323/login_with_google';
-            }}></img> 
+            }}></img>
           </div>
         </div>
       </div>

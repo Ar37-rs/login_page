@@ -1,4 +1,4 @@
-import { Routes, Route, Link, Navigate } from "react-router-dom";
+import { Routes, Route, Link } from "react-router-dom";
 import './App.css';
 import ProfileView from './components/ProfileView';
 import Home from './components/Home';
@@ -7,10 +7,9 @@ import Signup from './components/Signup';
 function App() {
   return (
     <div className="container">
-      <h1>Mini Aplikasi Login + Google OAuth2 </h1>
-
+      <h1>Login page + Google OAuth2</h1>
       <p>
-        Dibuat dalam rangka mengikuti program IP - Refactory.id
+        Fullstack built with Echo/golang + React/TS
       </p>
       <Routes>
         <Route index element={<Home />} />

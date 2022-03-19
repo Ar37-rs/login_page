@@ -77,7 +77,7 @@ function ProfileView() {
           setFirstLoad(false)
         }
       });
-    }, 500);
+    }, 800);
     return () => {
       window.clearInterval(timer);
     }

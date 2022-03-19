@@ -1,10 +1,10 @@
 # Frontend
 
-Langsung bisa dirun:
+How to run FE only:
 
 ```bash
 npm install
 npm start
 ```
 
-akan diredirect ke http://localhost:3000
+And then open http://localhost:3000
