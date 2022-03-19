@@ -1,10 +1,10 @@
 {
-  "name": "fullstack_js_frontend",
+  "name": "frontend",
   "version": "0.1.0",
-  "description": "Frontend for Fullstack JS Register/Login Google Auth - IP Test",
+  "description": "Frontend for Login Page + Google OAuth2",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Ar37-rs/fullstack_js_adya_roby.git"
+    "url": "git+https://github.com/Ar37-rs/login_page_plus_oauth2.git"
   },
   "author": "Ar37-rs",
   "license": "MIT",

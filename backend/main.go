@@ -20,6 +20,12 @@ import (
 	"golang.org/x/oauth2/google"
 )
 
+// Change these empty client_id and client_secret strings according to your GA ClientID and ClientSecret,
+// you have to add the url: http://localhost:1323/auth/oauth2 as one of your Authorised redirect URIs on your GA credential config.
+// for more info visit: https://console.cloud.google.com/apis/credentials
+const client_id = ""
+const client_secret = ""
+
 const authorized = "Authorized"
 const email_taken = "EmailTaken"
 const invalid_password = "InvalidPassword"
@@ -139,7 +145,7 @@ func handleRedirect(c echo.Context) error {
 	}
 	data, err := GAuserInfo(c.FormValue("state"), c.FormValue("code"))
 	if err != nil {
-		return c.String(http.StatusUnauthorized, "Timeout")
+		return c.String(http.StatusUnauthorized, unauthorized)
 	}
 
 	// for temporary password: data["id"] + data["name"]
@@ -199,8 +205,8 @@ func main() {
 	// oauth2 config
 	Oauth2Config = &oauth2.Config{
 		RedirectURL:  "http://localhost:1323/auth/oauth2",
-		ClientID:     "578732033166-4rvtsrgn4s5s0ppfrbqg46cd2ihtt71c.apps.googleusercontent.com",
-		ClientSecret: "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",
+		ClientID:     client_id,
+		ClientSecret: client_secret,
 		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email"},
 		Endpoint:     google.Endpoint,
 	}

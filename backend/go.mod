@@ -1,4 +1,4 @@
-module github.com/Ar37-rs/fullstack_adya_roby/fullstack_go_backend
+module github.com/Ar37-rs/login_page_plus_oauth2/backend
 
 go 1.18
 
