@@ -17,7 +17,6 @@ for example:
 const client_id = "574732033189-17hbq0na03Shqr6s9hcpehhr8maudius.apps.googleusercontent.com"
 const client_secret = "GOCSPD-rRvgd1RfhrjgyUQ5zOppYTCA1hQS"
 ```
-<br />
 and also you have to add the url: http://localhost:1323/auth/oauth2 as one of your Authorised redirect URIs on your GA credential config.<br />
 for more info visit: https://console.cloud.google.com/apis/credentials
 
