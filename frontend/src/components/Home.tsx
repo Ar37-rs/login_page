@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Navigate } from "react-router-dom";
 import axios from 'axios';
 
@@ -9,12 +9,26 @@ function Home() {
   }>({ email: '', password: '' });
   const [errors_msgs, setErrorsMsgs] = useState<{ email: string, password: string }>({ email: '', password: '' });
   const [errors_conds, setErrorsConds] = useState<{ email_err: boolean, password_err: boolean }>({ email_err: true, password_err: true });
+  const [fetching, setFetching] = useState(true);
+  const [message, setMessage] = useState('');
   const [neterror, setNeterror] = useState('');
+  const [redirect, setRedirect] = useState(false);
   const [signup, setSignup] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [logged, setLogged] = useState(false);
-  const [message, setMessage] = useState('');
   const [showpassword, setShowPassword] = useState("password");
+
+
+  useEffect(() => {
+    if (fetching) {
+      axios.post("http://localhost:1323/login_api", formdata, { withCredentials: true }).then(function (res) {
+        if ((res.data.message === "Logged") || (res.data.message === "Authorized")) {
+          setFetching(false);
+          setRedirect(true);
+          setSubmitted(true);
+        }
+      });
+    }
+  }, [fetching]);
 
   const handleSubmit = (event: { preventDefault: () => void; }) => {
     event.preventDefault();
@@ -28,26 +42,22 @@ function Home() {
           setErrorsMsgs({ ...errors_msgs, password: "Invalid Password" });
           setErrorsConds({ ...errors_conds, password_err: true });
         }
-        if (res.data.message === "Logged") {
-          setLogged(true);
+        if ((res.data.message === "Logged") || (res.data.message === "Authorized")) {
+          setRedirect(true);
         }
 
         if (res.data.message === "Unregistered") {
           setMessage("Email & Password are not registerd, try signup?");
         }
-
-        if (res.data.message === "Authorized") {
-          setLogged(true);
-        }
       }, function (error) {
         setNeterror(error.message);
-      })
+      });
     } else {
       setMessage("Please fill the required fields!");
     }
   }
 
-  if (submitted && logged) {
+  if (submitted && redirect) {
     return (<Navigate to="/profile_view" replace={true} />);
   } else if (signup) {
     return (<Navigate to="/signup" replace={true} />);

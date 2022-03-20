@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Navigate } from "react-router-dom";
 import axios from 'axios';
 
@@ -10,12 +10,25 @@ function Signup() {
   }>({ name: '', email: '', password: '' });
   const [errors_msgs, setErrorsMsgs] = useState<{ name: string, email: string, password: string }>({ name: '', email: '', password: '' });
   const [errors_conds, setErrorsConds] = useState<{ name_err: boolean, email_err: boolean, password_err: boolean }>({ name_err: true, email_err: true, password_err: true });
-  const [neterror, setNeterror] = useState('');
-  const [submitted, setSubmitted] = useState(false);
-  const [redirect, setRedirect] = useState(false);
+  const [fetching, setFetching] = useState(true);
   const [login, setLogin] = useState(false);
   const [message, setMessage] = useState('');
+  const [neterror, setNeterror] = useState('');
+  const [redirect, setRedirect] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const [showpassword, setShowPassword] = useState("password");
+
+  useEffect(() => {
+    if (fetching) {
+      axios.post("http://localhost:1323/login_api", formdata, { withCredentials: true }).then(function (res) {
+        if ((res.data.message === "Logged") || (res.data.message === "Authorized")) {
+          setFetching(false);
+          setRedirect(true);
+          setSubmitted(true);
+        }
+      });
+    }
+  }, [fetching]);
 
   const handleSubmit = (event: { preventDefault: () => void; }) => {
     event.preventDefault();
@@ -40,8 +53,11 @@ function Signup() {
           setRedirect(true);
         }
       }, function (error) {
-        setNeterror(error.message);
-      })
+        // Show error only if network error
+        if (!error.response) {
+          setNeterror(error.message);
+        }
+      });
     } else {
       setMessage("Please fill the required fields!");
     }

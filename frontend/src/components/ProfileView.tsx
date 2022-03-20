@@ -44,11 +44,34 @@ const Authorized: FC<ContentProps> = (prop) => {
 }
 
 function ProfileView() {
-  let [content, setContetnt] = useState({ name: '', email: '' });
-  let [logged, setLogged] = useState(false);
-  let [logout, setLogout] = useState(false);
-  let [login, setLogin] = useState(false);
-  let [firstload, setFirstLoad] = useState(true);
+  const [content, setContetnt] = useState({ name: '', email: '' });
+  const [fetching, setFetching] = useState(true);
+  const [logged, setLogged] = useState(false);
+  const [logout, setLogout] = useState(false);
+  const [login, setLogin] = useState(false);
+
+  useEffect(() => {
+    if (fetching) {
+      axios.get('http://localhost:1323/profile', { withCredentials: true }).then(function (res) {
+        if (res.status === 200) {
+          setContetnt({ name: res.data.name, email: res.data.email });
+          setLogged(true);
+          setFetching(false)
+        }
+      }, function (error) {
+        if (error.message) {
+          setContetnt({ name: error.message, email: "" });
+          setLogged(false);
+          setFetching(false)
+        } else {
+          setContetnt({ name: error.response.message, email: "" });
+          setLogged(false);
+          setFetching(false)
+        }
+      });
+    }
+  }, [fetching]);
+
   const handleLogout = (event: { preventDefault: () => void; }) => {
     event.preventDefault();
     axios.get('http://localhost:1323/logout_api', { withCredentials: true }).then(function (res) {
@@ -58,36 +81,11 @@ function ProfileView() {
     });
   }
 
-  useEffect(() => {
-    const timer = window.setInterval(async () => {
-      axios.get('http://localhost:1323/profile', { withCredentials: true }).then(function (res) {
-        if (res.status === 200) {
-          setContetnt({ name: res.data.name, email: res.data.email });
-          setLogged(true);
-          setFirstLoad(false)
-        }
-      }, function (error) {
-        if (error.message) {
-          setContetnt({ name: error.message, email: "" });
-          setLogged(false);
-          setFirstLoad(false)
-        } else {
-          setContetnt({ name: error.response.message, email: "" });
-          setLogged(false);
-          setFirstLoad(false)
-        }
-      });
-    }, 800);
-    return () => {
-      window.clearInterval(timer);
-    }
-  }, [setLogged, setFirstLoad])
-
   if (logout || login) {
     return (<Navigate to="/" replace={true} />);
   }
 
-  if (firstload) {
+  if (fetching) {
     return (
       <div>
         <div className="spinner-border" role={content.name}>

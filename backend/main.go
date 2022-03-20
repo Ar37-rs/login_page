@@ -22,7 +22,11 @@ import (
 
 // Change these empty client_id and client_secret strings according to your GA ClientID and ClientSecret,
 // you have to add the url: http://localhost:1323/auth/oauth2 as one of your Authorised redirect URIs on your GA credential config.
+// for example:
+// const client_id = "574732033189-17hbq0na03Shqr6s9hcpehhr8maudius.apps.googleusercontent.com"
+// const client_secret = "GOCSPD-rRvgd1RfhrjgyUQ5zOppYTCA1hQS"
 // for more info visit: https://console.cloud.google.com/apis/credentials
+
 const client_id = ""
 const client_secret = ""
 
@@ -91,7 +95,7 @@ func setCookie(cookie *http.Cookie, user User, c echo.Context) {
 func addUserOnline(user User) {
 	db_im, _ := OpenDbIM()
 	CreateTableIM(db_im)
-	InsertDBIM(db_im, LoggedInfo{Email: user.Email, Status: "logged"})
+	InsertDBIM(db_im, LoggedInfo{Email: user.Email, Status: "logged in"})
 	SelectAllDBIM(db_im)
 }
 
@@ -306,7 +310,7 @@ func main() {
 	e.GET("/logout_api", func(c echo.Context) (err error) {
 		cookie, err := c.Cookie("username_logged")
 		if err != nil {
-			return c.String(http.StatusOK, "empty result")
+			return c.String(http.StatusOK, "Already logged out")
 		}
 		db_im, err := OpenDbIM()
 		if err != nil {
@@ -321,6 +325,7 @@ func main() {
 		err = stmt.QueryRow(cookie.Value).Scan(&email)
 		resetCookie(cookie, c)
 		if err == nil {
+			fmt.Println(email, "logged out")
 			DeleteUserIM(db_im, email)
 		}
 		return c.JSON(http.StatusOK, OutMessage{Message: "Logged_out"})

@@ -3,97 +3,99 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="985px" height="751px" viewBox="0 0 985 751" enable-background="new 0 0 985 751" xml:space="preserve">
-<path pointer-events="stroke" fill="none" stroke="#000000" stroke-miterlimit="10" d="M504,290h-93.63"/>
-<path pointer-events="all" stroke="#000000" stroke-miterlimit="10" d="M405.12,290l7-3.5l-1.75,3.5l1.75,3.5L405.12,290z"/>
-<path pointer-events="stroke" fill="none" stroke="#000000" stroke-miterlimit="10" d="M404,230h93.63"/>
-<path pointer-events="all" stroke="#000000" stroke-miterlimit="10" d="M502.88,230l-7,3.5l1.75-3.5l-1.75-3.5L502.88,230z"/>
-<rect x="89" y="230" pointer-events="all" fill="#FFFFFF" stroke="#000000" width="90" height="60"/>
-<g transform="translate(-0.5 -0.5)">
-	<text transform="matrix(1 0 0 1 104.3047 264)" font-family="'ArialMT'" font-size="12">Login page</text>
+<g>
+	<path pointer-events="stroke" fill="none" stroke="#000000" stroke-miterlimit="10" d="M504,290h-93.63"/>
+	<path pointer-events="all" stroke="#000000" stroke-miterlimit="10" d="M405.12,290l7-3.5l-1.75,3.5l1.75,3.5L405.12,290z"/>
+	<path pointer-events="stroke" fill="none" stroke="#000000" stroke-miterlimit="10" d="M404,230h93.63"/>
+	<path pointer-events="all" stroke="#000000" stroke-miterlimit="10" d="M502.88,230l-7,3.5l1.75-3.5l-1.75-3.5L502.88,230z"/>
+	<rect x="89" y="230" pointer-events="all" fill="#FFFFFF" stroke="#000000" width="90" height="60"/>
+	<g transform="translate(-0.5 -0.5)">
+		<text transform="matrix(1 0 0 1 104.3047 264)" font-family="'ArialMT'" font-size="12">Login page</text>
+	</g>
+	<rect x="524" y="230" pointer-events="all" fill="#FFFFFF" stroke="#000000" width="120" height="60"/>
+	<g transform="translate(-0.5 -0.5)">
+		<text transform="matrix(1 0 0 1 538.3145 264)" font-family="'ArialMT'" font-size="12">Check validatiom</text>
+	</g>
+	<rect x="434" y="260" pointer-events="all" fill="none" width="50" height="20"/>
+	<g transform="translate(-0.5 -0.5)">
+		<text transform="matrix(1 0 0 1 441.6563 274)" font-family="'ArialMT'" font-size="12">Invalid</text>
+	</g>
+	<path pointer-events="stroke" fill="none" stroke="#000000" stroke-miterlimit="10" d="M664,260h103.63"/>
+	<path pointer-events="all" stroke="#000000" stroke-miterlimit="10" d="M772.88,260l-7,3.5l1.75-3.5l-1.75-3.5L772.88,260z"/>
+	<rect x="784" y="230" pointer-events="all" fill="#FFFFFF" stroke="#000000" width="120" height="60"/>
+	<g transform="translate(-0.5 -0.5)">
+		<text transform="matrix(1 0 0 1 818.3154 264)" font-family="'ArialMT'" font-size="12">Database</text>
+	</g>
+	<rect x="279" y="230" pointer-events="all" fill="#FFFFFF" stroke="#000000" width="110" height="60"/>
+	<g transform="translate(-0.5 -0.5)">
+		<text transform="matrix(1 0 0 1 303.6543 264)" font-family="'ArialMT'" font-size="12">User inputs</text>
+	</g>
+	<rect x="694" y="230" pointer-events="all" fill="none" width="60" height="30"/>
+	<g transform="translate(-0.5 -0.5)">
+		<text transform="matrix(1 0 0 1 696 249)" font-family="'ArialMT'" font-size="12">Valid</text>
+	</g>
+	<rect x="494" y="410" pointer-events="all" fill="#FFFFFF" stroke="#000000" width="80" height="60"/>
+	<g transform="translate(-0.5 -0.5)">
+		<text transform="matrix(1 0 0 1 515.3174 444)" font-family="'ArialMT'" font-size="12">Signup</text>
+	</g>
+	<path pointer-events="stroke" fill="none" stroke="#000000" stroke-miterlimit="10" d="M664,440h-10h-53.63"/>
+	<path pointer-events="all" stroke="#000000" stroke-miterlimit="10" d="M595.12,440l7-3.5l-1.75,3.5l1.75,3.5L595.12,440z"/>
+	<rect x="680" y="410" pointer-events="all" fill="#FFFFFF" stroke="#000000" width="124" height="60"/>
+	<g transform="translate(-0.5 -0.5)">
+		<text transform="matrix(1 0 0 1 690.2988 444)" font-family="'ArialMT'" font-size="12">Data not recognized</text>
+	</g>
+	<rect x="864" y="410" pointer-events="all" fill="#FFFFFF" stroke="#000000" width="120" height="60"/>
+	<g transform="translate(-0.5 -0.5)">
+		<text transform="matrix(1 0 0 1 877.9717 444)" font-family="'ArialMT'" font-size="12">Data Recognized</text>
+	</g>
+	<rect x="864" y="690" pointer-events="all" fill="#FFFFFF" stroke="#000000" width="120" height="60"/>
+	<g transform="translate(-0.5 -0.5)">
+		<text transform="matrix(1 0 0 1 875.6367 724)" font-family="'ArialMT'" font-size="12">/profile_view page</text>
+	</g>
+	<rect x="745.25" y="298.75" pointer-events="all" fill="none" width="180" height="102.5"/>
+	<path pointer-events="all" fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" d="M925.25,401.25V350h-180
+		v51.25"/>
+	<path pointer-events="all" fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" d="M835.25,298.75V350"/>
+	<path pointer-events="stroke" fill="none" stroke="#000000" stroke-miterlimit="10" d="M484,440H334V306.37"/>
+	<path pointer-events="all" stroke="#000000" stroke-miterlimit="10" d="M334,301.12l3.5,7l-3.5-1.75l-3.5,1.75L334,301.12z"/>
+	<rect x="74" y="90" pointer-events="all" fill="#FFFFFF" stroke="#000000" width="120" height="60"/>
+	<g transform="translate(-0.5 -0.5)">
+		<text transform="matrix(1 0 0 1 94.6338 124)" font-family="'ArialMT'" font-size="12">Google oauth2</text>
+	</g>
+	<path pointer-events="stroke" fill="none" stroke="#000000" stroke-miterlimit="10" d="M133.5,210v-10v-23.63"/>
+	<path pointer-events="all" stroke="#000000" stroke-miterlimit="10" d="M133.5,171.12l3.5,7l-3.5-1.75l-3.5,1.75L133.5,171.12z"/>
+	<path pointer-events="stroke" fill="none" stroke="#000000" stroke-miterlimit="10" d="M194,260h60h3.63"/>
+	<path pointer-events="all" stroke="#000000" stroke-miterlimit="10" d="M262.88,260l-7,3.5l1.75-3.5l-1.75-3.5L262.88,260z"/>
+	<rect x="299" y="90" pointer-events="all" fill="#FFFFFF" stroke="#000000" width="90" height="60"/>
+	<g transform="translate(-0.5 -0.5)">
+		<text transform="matrix(1 0 0 1 308.3164 124)" font-family="'ArialMT'" font-size="12">Access token</text>
+	</g>
+	<rect x="474" y="90" pointer-events="all" fill="#FFFFFF" stroke="#000000" width="90" height="60"/>
+	<g transform="translate(-0.5 -0.5)">
+		<text transform="matrix(1 0 0 1 482.6455 124)" font-family="'ArialMT'" font-size="12">Get  userdata</text>
+	</g>
+	<rect x="84" pointer-events="all" fill="none" width="100" height="40"/>
+	<g transform="translate(-0.5 -0.5)">
+		<text transform="matrix(1 0 0 1 75.9922 27)" font-family="'Arial-BoldMT'" font-size="24">Flowchart</text>
+	</g>
+	<path pointer-events="stroke" fill="none" stroke="#000000" stroke-miterlimit="10" d="M209,120l60-0.5h3.63"/>
+	<path pointer-events="all" stroke="#000000" stroke-miterlimit="10" d="M277.88,119.5l-7,3.5l1.75-3.5l-1.75-3.5L277.88,119.5z"/>
+	<path pointer-events="stroke" fill="none" stroke="#000000" stroke-miterlimit="10" d="M404,120l50-0.5h3.63"/>
+	<path pointer-events="all" stroke="#000000" stroke-miterlimit="10" d="M462.88,119.5l-7,3.5l1.75-3.5l-1.75-3.5L462.88,119.5z"/>
+	<rect x="384" y="420" pointer-events="all" fill="none" width="70" height="30"/>
+	<g transform="translate(-0.5 -0.5)">
+		<text transform="matrix(1 0 0 1 390.6494 439)" font-family="'ArialMT'" font-size="12">Revalidate</text>
+	</g>
+	<rect x="858" y="550" pointer-events="all" fill="#FFFFFF" stroke="#000000" width="126" height="60"/>
+	<g transform="translate(-0.5 -0.5)">
+		<text transform="matrix(1 0 0 1 864.9697 584)" font-family="'ArialMT'" font-size="12">Create cookie session</text>
+	</g>
+	<path pointer-events="stroke" fill="none" stroke="#000000" stroke-miterlimit="10" d="M923.5,480v53.63"/>
+	<path pointer-events="all" stroke="#000000" stroke-miterlimit="10" d="M923.5,538.88l-3.5-7l3.5,1.75l3.5-1.75L923.5,538.88z"/>
+	<path pointer-events="stroke" fill="none" stroke="#000000" stroke-miterlimit="10" d="M923.5,620v53.63"/>
+	<path pointer-events="all" stroke="#000000" stroke-miterlimit="10" d="M923.5,678.88l-3.5-7l3.5,1.75l3.5-1.75L923.5,678.88z"/>
+	<path pointer-events="all" stroke="#000000" stroke-miterlimit="10" d="M835.25,221.25l-3.5-7l3.5,1.75l3.5-1.75L835.25,221.25z"/>
+	<line fill="none" stroke="#000000" stroke-width="1.4" stroke-miterlimit="10" x1="580" y1="119.5" x2="835.25" y2="119.5"/>
+	<line fill="none" stroke="#000000" stroke-miterlimit="10" x1="835.25" y1="119.5" x2="835.25" y2="216"/>
 </g>
-<rect x="524" y="230" pointer-events="all" fill="#FFFFFF" stroke="#000000" width="120" height="60"/>
-<g transform="translate(-0.5 -0.5)">
-	<text transform="matrix(1 0 0 1 538.3145 264)" font-family="'ArialMT'" font-size="12">Check validatiom</text>
-</g>
-<rect x="434" y="260" pointer-events="all" fill="none" width="50" height="20"/>
-<g transform="translate(-0.5 -0.5)">
-	<text transform="matrix(1 0 0 1 441.6563 274)" font-family="'ArialMT'" font-size="12">Invalid</text>
-</g>
-<path pointer-events="stroke" fill="none" stroke="#000000" stroke-miterlimit="10" d="M664,260h103.63"/>
-<path pointer-events="all" stroke="#000000" stroke-miterlimit="10" d="M772.88,260l-7,3.5l1.75-3.5l-1.75-3.5L772.88,260z"/>
-<rect x="784" y="230" pointer-events="all" fill="#FFFFFF" stroke="#000000" width="120" height="60"/>
-<g transform="translate(-0.5 -0.5)">
-	<text transform="matrix(1 0 0 1 818.3154 264)" font-family="'ArialMT'" font-size="12">Database</text>
-</g>
-<rect x="279" y="230" pointer-events="all" fill="#FFFFFF" stroke="#000000" width="110" height="60"/>
-<g transform="translate(-0.5 -0.5)">
-	<text transform="matrix(1 0 0 1 303.6543 264)" font-family="'ArialMT'" font-size="12">User inputs</text>
-</g>
-<rect x="694" y="230" pointer-events="all" fill="none" width="60" height="30"/>
-<g transform="translate(-0.5 -0.5)">
-	<text transform="matrix(1 0 0 1 696 249)" font-family="'ArialMT'" font-size="12">Valid</text>
-</g>
-<rect x="494" y="410" pointer-events="all" fill="#FFFFFF" stroke="#000000" width="80" height="60"/>
-<g transform="translate(-0.5 -0.5)">
-	<text transform="matrix(1 0 0 1 515.3174 444)" font-family="'ArialMT'" font-size="12">Signup</text>
-</g>
-<path pointer-events="stroke" fill="none" stroke="#000000" stroke-miterlimit="10" d="M664,440h-10h-53.63"/>
-<path pointer-events="all" stroke="#000000" stroke-miterlimit="10" d="M595.12,440l7-3.5l-1.75,3.5l1.75,3.5L595.12,440z"/>
-<rect x="684" y="410" pointer-events="all" fill="#FFFFFF" stroke="#000000" width="120" height="60"/>
-<g transform="translate(-0.5 -0.5)">
-	<text transform="matrix(1 0 0 1 690.2988 444)" font-family="'ArialMT'" font-size="12">Data not recognized</text>
-</g>
-<rect x="864" y="410" pointer-events="all" fill="#FFFFFF" stroke="#000000" width="120" height="60"/>
-<g transform="translate(-0.5 -0.5)">
-	<text transform="matrix(1 0 0 1 877.9717 444)" font-family="'ArialMT'" font-size="12">Data Recognized</text>
-</g>
-<rect x="864" y="690" pointer-events="all" fill="#FFFFFF" stroke="#000000" width="120" height="60"/>
-<g transform="translate(-0.5 -0.5)">
-	<text transform="matrix(1 0 0 1 875.6367 724)" font-family="'ArialMT'" font-size="12">/profile_view page</text>
-</g>
-<rect x="745.25" y="298.75" pointer-events="all" fill="none" width="180" height="102.5"/>
-<path pointer-events="all" fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" d="M925.25,401.25V350h-180v51.25
-	"/>
-<path pointer-events="all" fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" d="M835.25,298.75V350"/>
-<path pointer-events="stroke" fill="none" stroke="#000000" stroke-miterlimit="10" d="M484,440H334V306.37"/>
-<path pointer-events="all" stroke="#000000" stroke-miterlimit="10" d="M334,301.12l3.5,7l-3.5-1.75l-3.5,1.75L334,301.12z"/>
-<rect x="74" y="90" pointer-events="all" fill="#FFFFFF" stroke="#000000" width="120" height="60"/>
-<g transform="translate(-0.5 -0.5)">
-	<text transform="matrix(1 0 0 1 94.6338 124)" font-family="'ArialMT'" font-size="12">Google oauth2</text>
-</g>
-<path pointer-events="stroke" fill="none" stroke="#000000" stroke-miterlimit="10" d="M133.5,210v-10v-23.63"/>
-<path pointer-events="all" stroke="#000000" stroke-miterlimit="10" d="M133.5,171.12l3.5,7l-3.5-1.75l-3.5,1.75L133.5,171.12z"/>
-<path pointer-events="stroke" fill="none" stroke="#000000" stroke-miterlimit="10" d="M194,260h60h3.63"/>
-<path pointer-events="all" stroke="#000000" stroke-miterlimit="10" d="M262.88,260l-7,3.5l1.75-3.5l-1.75-3.5L262.88,260z"/>
-<rect x="299" y="90" pointer-events="all" fill="#FFFFFF" stroke="#000000" width="90" height="60"/>
-<g transform="translate(-0.5 -0.5)">
-	<text transform="matrix(1 0 0 1 308.3164 124)" font-family="'ArialMT'" font-size="12">Access token</text>
-</g>
-<rect x="474" y="90" pointer-events="all" fill="#FFFFFF" stroke="#000000" width="90" height="60"/>
-<g transform="translate(-0.5 -0.5)">
-	<text transform="matrix(1 0 0 1 482.6455 124)" font-family="'ArialMT'" font-size="12">Get  userdata</text>
-</g>
-<rect x="84" pointer-events="all" fill="none" width="100" height="40"/>
-<g transform="translate(-0.5 -0.5)">
-	<text transform="matrix(1 0 0 1 75.9922 27)" font-family="'Arial-BoldMT'" font-size="24">Flowchart</text>
-</g>
-<path pointer-events="stroke" fill="none" stroke="#000000" stroke-miterlimit="10" d="M209,120l60-0.5h3.63"/>
-<path pointer-events="all" stroke="#000000" stroke-miterlimit="10" d="M277.88,119.5l-7,3.5l1.75-3.5l-1.75-3.5L277.88,119.5z"/>
-<path pointer-events="stroke" fill="none" stroke="#000000" stroke-miterlimit="10" d="M404,120l50-0.5h3.63"/>
-<path pointer-events="all" stroke="#000000" stroke-miterlimit="10" d="M462.88,119.5l-7,3.5l1.75-3.5l-1.75-3.5L462.88,119.5z"/>
-<rect x="384" y="420" pointer-events="all" fill="none" width="70" height="30"/>
-<g transform="translate(-0.5 -0.5)">
-	<text transform="matrix(1 0 0 1 390.6494 439)" font-family="'ArialMT'" font-size="12">Revalidate</text>
-</g>
-<rect x="864" y="550" pointer-events="all" fill="#FFFFFF" stroke="#000000" width="120" height="60"/>
-<g transform="translate(-0.5 -0.5)">
-	<text transform="matrix(1 0 0 1 864.9697 584)" font-family="'ArialMT'" font-size="12">Create cookie session</text>
-</g>
-<path pointer-events="stroke" fill="none" stroke="#000000" stroke-miterlimit="10" d="M923.5,480v53.63"/>
-<path pointer-events="all" stroke="#000000" stroke-miterlimit="10" d="M923.5,538.88l-3.5-7l3.5,1.75l3.5-1.75L923.5,538.88z"/>
-<path pointer-events="stroke" fill="none" stroke="#000000" stroke-miterlimit="10" d="M923.5,620v53.63"/>
-<path pointer-events="all" stroke="#000000" stroke-miterlimit="10" d="M923.5,678.88l-3.5-7l3.5,1.75l3.5-1.75L923.5,678.88z"/>
-<path pointer-events="all" stroke="#000000" stroke-miterlimit="10" d="M835.25,221.25l-3.5-7l3.5,1.75l3.5-1.75L835.25,221.25z"/>
-<line fill="none" stroke="#000000" stroke-width="1.4" stroke-miterlimit="10" x1="580" y1="119.5" x2="835.25" y2="119.5"/>
-<line fill="none" stroke="#000000" stroke-miterlimit="10" x1="835.25" y1="119.5" x2="835.25" y2="216"/>
 </svg>
