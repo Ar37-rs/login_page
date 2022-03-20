@@ -56,17 +56,17 @@ function ProfileView() {
         if (res.status === 200) {
           setContetnt({ name: res.data.name, email: res.data.email });
           setLogged(true);
-          setFetching(false)
+          setFetching(false);
         }
       }, function (error) {
         if (error.message) {
           setContetnt({ name: error.message, email: "" });
           setLogged(false);
-          setFetching(false)
+          setFetching(false);
         } else {
           setContetnt({ name: error.response.message, email: "" });
           setLogged(false);
-          setFetching(false)
+          setFetching(false);
         }
       });
     }
